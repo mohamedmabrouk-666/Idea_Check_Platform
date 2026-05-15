@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<!--
+  base.html - Master Layout Template
+  Every other page extends this file using: extends "base.html"
+  Contains: navbar, flash messages, main content block, footer
+  Theme: Engineering Faculty - Navy + Steel Blue
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Page title — each child page overrides this block -->
+  <title>{% block title %}IdeaCheck — Project Similarity Checker{% endblock %}</title>
+
+  <!-- Google Fonts: Rajdhani for headings + Source Sans 3 for body text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 — for all icons used across the platform -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <!-- Main stylesheet — colors, components, layout -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+
+  <!-- CSRF token meta tag — used by JS fetch requests if needed -->
+  <meta name="csrf-token" content="{{ csrf_token() }}"/>
+
+  <!-- Extra CSS block — child pages can inject additional styles here -->
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- ================================================================
+     NAVBAR — sticky top navigation bar
+     Shows different links based on login state and user role
+     ================================================================ -->
+<nav class="navbar">
+  <div class="nav-container">
+
+    <!-- Logo: compass icon + "IdeaCheck" brand name -->
+    <a href="{{ url_for('student.index') }}" class="nav-logo">
+      <i class="fas fa-drafting-compass"></i>
+      <span>IdeaCheck</span>
+    </a>
+
+    <!-- Navigation links — changes based on whether user is logged in -->
+    <ul class="nav-links">
+
+      {% if session.get('user_id') %}
+        <!-- User is logged in — show role-specific links -->
+
+        {% if session.get('user_role') == 'admin' %}
+          <!-- Admin links -->
+          <li>
+            <a href="{{ url_for('admin.dashboard') }}">
+              <i class="fas fa-chart-bar"></i> Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('admin.projects') }}">
+              <i class="fas fa-database"></i> Projects DB
+            </a>
+          </li>
+        {% else %}
+          <!-- Student links -->
+          <li>
+            <a href="{{ url_for('student.check') }}">
+              <i class="fas fa-search"></i> Check Idea
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('student.history') }}">
+              <i class="fas fa-history"></i> My History
+            </a>
+          </li>
+        {% endif %}
+
+        <!-- Logout — shown for both admin and student -->
+        <li>
+          <a href="{{ url_for('auth.logout') }}" class="btn-nav-logout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </li>
+
+      {% else %}
+        <!-- User is NOT logged in — show login/register links -->
+        <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+        <li>
+          <a href="{{ url_for('auth.register') }}" class="btn-nav-register">
+            Register
+          </a>
+        </li>
+      {% endif %}
+
+    </ul>
+  </div>
+</nav>
+<!-- END NAVBAR -->
+
+
+<!-- ================================================================
+     FLASH MESSAGES — temporary notifications shown after actions
+     Example: "Registration successful!" or "Invalid password"
+     Auto-dismissed by admin.js after 4 seconds
+     ================================================================ -->
+<div class="flash-container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+
+          {% if category == 'success' %}
+            <i class="fas fa-check-circle"></i>
+          {% elif category == 'error' %}
+            <i class="fas fa-exclamation-circle"></i>
+          {% elif category == 'warning' %}
+            <i class="fas fa-exclamation-triangle"></i>
+          {% else %}
+            <i class="fas fa-info-circle"></i>
+          {% endif %}
+
+          {{ message }}
+
+          <!-- Close button — removes the flash message immediately -->
+          <button class="flash-close" onclick="this.parentElement.remove()">
+            &times;
+          </button>
+
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+</div>
+<!-- END FLASH MESSAGES -->
+
+
+<!-- ================================================================
+     MAIN CONTENT — each child page fills this block
+     ================================================================ -->
+<main class="main-content">
+  {% block content %}{% endblock %}
+</main>
+<!-- END MAIN CONTENT -->
+
+
+<!-- ================================================================
+     FOOTER
+     ================================================================ -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-logo">
+      <i class="fas fa-drafting-compass"></i>
+      <span>IdeaCheck</span>
+    </div>
+    <p class="footer-text">Faculty of Engineering — Graduation Project Similarity Checker</p>
+    <p class="footer-copy">Built with Flask &amp; scikit-learn</p>
+  </div>
+</footer>
+<!-- END FOOTER -->
+
+
+<!-- Extra JS block — child pages can inject scripts here -->
+{% block extra_js %}{% endblock %}
+
+<!-- Auto-dismiss flash messages after 4 seconds -->
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+
+</body>
+</html>

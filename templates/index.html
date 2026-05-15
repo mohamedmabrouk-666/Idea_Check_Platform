@@ -1,0 +1,59 @@
+<!--
+  index.html — Landing Page
+  The first page visitors see before logging in
+  Shows: hero section, features, and call-to-action buttons
+-->
+{% extends "base.html" %}
+{% block title %}IdeaCheck — Graduation Project Similarity Checker{% endblock %}
+
+{% block content %}
+<div class="container-wide">
+
+  <!-- ── HERO SECTION ──────────────────────────────────── -->
+  <!-- Big intro section with platform name and description -->
+  <section class="hero">
+    <h1><i class="fas fa-drafting-compass"></i> Idea<span>Check</span></h1>
+    <p>
+      Submit your graduation project idea and instantly find out how similar it is
+      to previous projects at the Faculty of Engineering.
+    </p>
+    <!-- Call-to-action buttons -->
+    <div class="hero-actions">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary">
+        <i class="fas fa-rocket"></i> Get Started
+      </a>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </a>
+    </div>
+  </section>
+
+  <!-- ── HOW IT WORKS ───────────────────────────────────── -->
+  <h2 class="text-center mb-2">How It Works</h2>
+  <div class="features-grid">
+
+    <!-- Step 1 -->
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-pen-to-square"></i></div>
+      <h3>1. Submit Your Idea</h3>
+      <p>Write your project title and a short description (50–200 words) explaining your concept.</p>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-brain"></i></div>
+      <h3>2. AI Analyzes It</h3>
+      <p>Our NLP engine compares your idea against hundreds of previous graduation projects using TF-IDF and cosine similarity.</p>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-chart-pie"></i></div>
+      <h3>3. Get Your Score</h3>
+      <p>Receive a similarity percentage, see the most related past projects, and get personalized suggestions to refine your idea.</p>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

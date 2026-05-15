@@ -1,0 +1,44 @@
+# ============================================================
+# docker-compose.yml — Defines all services needed to run the app
+# Services: flask (web app) + mysql (database)
+# Run with: docker-compose up --build
+# ============================================================
+
+
+services:
+
+  # ── Flask Web Application ──────────────────────────────────
+  web:
+    build:
+      context: ..           # Build from project root (parent of docker/)
+      dockerfile: docker/Dockerfile
+    ports:
+      - "5000:5000"         # Map localhost:5000 to container:5000
+    environment:
+      - SECRET_KEY=change_this_in_production
+      - MYSQL_HOST=db       # 'db' is the MySQL service name below
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=rootpassword
+      - MYSQL_DB=similarity_checker
+    depends_on:
+      - db                  # Wait for MySQL to start before Flask starts
+    volumes:
+      - ..:/app             # Mount project folder (for development hot-reload)
+
+  # ── MySQL Database ─────────────────────────────────────────
+  db:
+    image: mysql:8.0        # Use official MySQL 8 image
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword      # Root password
+      MYSQL_DATABASE: similarity_checker     # Auto-create this database
+    ports:
+      - "3307:3306"         # Expose MySQL port for external tools (e.g. DBeaver)
+    volumes:
+      - mysql_data:/var/lib/mysql            # Persist data between restarts
+      - ../database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql  # Auto-run schema
+      - ../database/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql      # Auto-run seed data
+  
+    
+# ── Named volumes (persist data even if containers are removed)
+volumes:
+  mysql_data:

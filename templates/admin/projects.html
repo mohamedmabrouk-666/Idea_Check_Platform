@@ -1,0 +1,172 @@
+<!--
+  admin/projects.html — Manage Old Projects Database
+  Admin can: search, filter, add, and delete projects
+  Data from routes/admin.py: projects, departments, search, selected_dept
+-->
+{% extends "base.html" %}
+{% block title %}Manage Projects — IdeaCheck{% endblock %}
+
+{% block content %}
+<div class="container-wide">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <h1><i class="fas fa-database"></i> Projects Database</h1>
+    <p>Manage the old graduation projects used for similarity comparison</p>
+  </div>
+
+  <!-- ── ADD NEW PROJECT FORM ───────────────────────────── -->
+  <div class="card">
+    <div class="card-title"><i class="fas fa-plus-circle"></i> Add New Project</div>
+
+    <!-- POST to /admin/projects/add -->
+    <form method="POST" action="{{ url_for('admin.add_project') }}">
+      <!-- CSRF hidden token — Flask-WTF verifies this on every POST request -->
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+
+        <!-- Title -->
+        <div class="form-group">
+          <label>Project Title</label>
+          <input type="text" name="title" placeholder="Enter project title" required />
+        </div>
+
+        <!-- Department dropdown -->
+        <div class="form-group">
+          <label>Department</label>
+          <select name="department">
+            <option value="">— Select Department —</option>
+            <option>Computer Engineering</option>
+            <option>Electrical Engineering</option>
+            <option>Mechanical Engineering</option>
+            <option>Civil Engineering</option>
+            <option>Chemical Engineering</option>
+            <option>Communications Engineering</option>
+          </select>
+        </div>
+
+        <!-- Year -->
+        <div class="form-group">
+          <label>Year</label>
+          <input type="number" name="year" placeholder="e.g. 2023" min="2000" max="2030" />
+        </div>
+
+        <!-- Keywords -->
+        <div class="form-group">
+          <label>Keywords <span class="label-hint">(optional, comma-separated)</span></label>
+          <input type="text" name="keywords" placeholder="e.g. IoT, Arduino, mobile app" />
+        </div>
+
+      </div>
+
+      <!-- Description spans full width -->
+      <div class="form-group">
+        <label>Project Description <span class="label-hint">(at least 50 words)</span></label>
+        <textarea name="description" rows="4"
+                  placeholder="Detailed description of the project..." required></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add Project
+      </button>
+    </form>
+  </div>
+
+  <!-- ── SEARCH & FILTER ────────────────────────────────── -->
+  <div class="card">
+    <form method="GET" action="{{ url_for('admin.projects') }}" class="flex-gap">
+
+      <!-- Text search -->
+      <input type="text" name="search" value="{{ search }}"
+             placeholder="Search by title or description..."
+             style="flex:1; min-width:200px;" />
+
+      <!-- Department filter dropdown -->
+      <select name="department" style="min-width:200px;">
+        <option value="">All Departments</option>
+        {% for dept in departments %}
+        <option value="{{ dept }}" {% if dept == selected_dept %}selected{% endif %}>
+          {{ dept }}
+        </option>
+        {% endfor %}
+      </select>
+
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-search"></i> Search
+      </button>
+
+      <!-- Clear filters link -->
+      {% if search or selected_dept %}
+      <a href="{{ url_for('admin.projects') }}" class="btn btn-secondary">
+        <i class="fas fa-times"></i> Clear
+      </a>
+      {% endif %}
+
+    </form>
+  </div>
+
+  <!-- ── PROJECTS TABLE ─────────────────────────────────── -->
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Title</th>
+          <th>Department</th>
+          <th>Year</th>
+          <th>Keywords</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if projects %}
+          {% for p in projects %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td><strong>{{ p.title }}</strong></td>
+            <td>{{ p.department or '—' }}</td>
+            <td>{{ p.year or '—' }}</td>
+            <td style="font-size:0.82rem; color:var(--gray);">
+              {{ p.keywords or '—' }}
+            </td>
+            <td>
+              <div class="flex-gap">
+                <!-- Edit button — GET to /admin/projects/edit/<id> -->
+                <a href="{{ url_for('admin.edit_project', project_id=p.id) }}"
+                   class="btn btn-secondary btn-sm">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <!-- Delete button — POST to /admin/projects/delete/<id> -->
+                <form method="POST"
+                      action="{{ url_for('admin.delete_project', project_id=p.id) }}"
+                      onsubmit="return confirm('Delete this project?')">
+      <!-- CSRF hidden token — Flask-WTF verifies this on every POST request -->
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                  <button type="submit" class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="6" class="text-center text-gray" style="padding:2rem;">
+              No projects found. Add some above or adjust your search.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Result count -->
+  <p class="text-gray mt-1" style="font-size:0.88rem;">
+    Showing {{ projects | length }} project(s)
+  </p>
+
+</div>
+{% endblock %}

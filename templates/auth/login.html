@@ -1,0 +1,52 @@
+
+<!--
+  auth/login.html — Login Page
+  Simple centered card form
+  Submits POST to /login route in routes/auth.py
+-->
+{% extends "base.html" %}
+{% block title %}Login — IdeaCheck{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <!-- Page heading -->
+    <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
+    <p class="auth-subtitle">Welcome back — enter your credentials to continue</p>
+
+    <!-- Login form — POST to /login -->
+    <form method="POST" action="{{ url_for('auth.login') }}">
+      <!-- CSRF hidden token — Flask-WTF verifies this on every POST request -->
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+
+      <!-- Email field -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email"
+               placeholder="your@university.edu" required />
+      </div>
+
+      <!-- Password field -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"
+               placeholder="Enter your password" required />
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit" class="btn btn-primary btn-block">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+
+    </form>
+
+    <!-- Link to register page -->
+    <p class="auth-switch">
+      Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

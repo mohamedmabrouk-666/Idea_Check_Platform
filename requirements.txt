@@ -1,0 +1,15 @@
+# ============================================================
+# requirements.txt
+# All Python packages needed to run the application
+# Install with: pip install -r requirements.txt
+# ============================================================
+
+flask==2.3.3            # Main web framework
+flask-mysqldb==1.0.1       # MySQL connector for Flask
+python-dotenv==1.0.0       # Load environment variables from .env file
+bcrypt==4.1.2              # Password hashing (never store plain passwords)
+scikit-learn==1.4.0        # TF-IDF vectorizer + cosine similarity (the NLP core)
+reportlab==4.1.0           # PDF export for result reports
+flask-limiter==3.5.0       # Rate limiting (prevent spam/abuse)
+flask-wtf==1.2.1           # CSRF protection — prevent cross-site request forgery
+PyMySQL==1.1.0

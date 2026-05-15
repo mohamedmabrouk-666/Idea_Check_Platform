@@ -1,0 +1,102 @@
+<!--
+  student/check.html — Submit Idea Form
+  The main page where students enter their project title and description
+  Includes: live word counter, client-side validation, department dropdown
+  Submits POST to /check route in routes/student.py
+-->
+{% extends "base.html" %}
+{% block title %}Check Your Idea — IdeaCheck{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Page header with user greeting -->
+  <div class="page-header">
+    <h1><i class="fas fa-search"></i> Check Your Project Idea</h1>
+    <p>Hello, {{ session.get('user_name') }} — fill in the form below to analyze your idea</p>
+  </div>
+
+  <!-- ── SUBMISSION FORM ───────────────────────────────── -->
+  <div class="card">
+    <div class="card-title">
+      <i class="fas fa-lightbulb"></i> Your Project Idea
+    </div>
+
+    <!-- Form submits POST to /check -->
+    <form method="POST" action="{{ url_for('student.check') }}" id="checkForm">
+      <!-- CSRF hidden token — Flask-WTF verifies this on every POST request -->
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+
+      <!-- Project Title -->
+      <div class="form-group">
+        <label for="title">
+          Project Title
+          <span class="label-hint">(5 to 15 words)</span>
+        </label>
+        <input type="text" id="title" name="title"
+               placeholder="e.g. Smart Attendance System Using Face Recognition and Machine Learning"
+               required />
+        <!-- Live word counter for title -->
+        <div class="word-counter" id="titleCounter">0 words</div>
+      </div>
+
+      <!-- Department -->
+      <div class="form-group">
+        <label for="department">Department</label>
+        <select id="department" name="department" required>
+          <option value="">— Select your department —</option>
+          <option value="Computer Engineering">Computer Engineering</option>
+          <option value="Electrical Engineering">Electrical Engineering</option>
+          <option value="Mechanical Engineering">Mechanical Engineering</option>
+          <option value="Civil Engineering">Civil Engineering</option>
+          <option value="Chemical Engineering">Chemical Engineering</option>
+          <option value="Communications Engineering">Communications Engineering</option>
+        </select>
+      </div>
+
+      <!-- Project Description -->
+      <div class="form-group">
+        <label for="description">
+          Project Description
+          <span class="label-hint">(50 to 200 words)</span>
+        </label>
+        <textarea id="description" name="description" rows="7"
+          placeholder="Describe your project idea in detail. Explain:
+- What problem does it solve?
+- What technology or methods will you use?
+- What is the expected result?
+
+Example: 'This project aims to build a web application that allows students to track their grades and attendance using a Flask backend and MySQL database. The system will send automated email alerts when grades drop below a threshold...' "
+          required></textarea>
+        <!-- Live word counter for description — changes color based on count -->
+        <div class="word-counter" id="descCounter">0 / 50–200 words</div>
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+        <i class="fas fa-paper-plane"></i> Analyze My Idea
+      </button>
+
+    </form>
+  </div>
+
+  <!-- ── TIPS BOX ──────────────────────────────────────── -->
+  <!-- Advice to help students write a good description -->
+  <div class="card">
+    <div class="card-title"><i class="fas fa-info-circle"></i> Tips for a Better Result</div>
+    <ul class="suggestion-tips">
+      <li>Mention the <strong>specific technology</strong> you plan to use (e.g., Flask, Arduino, TensorFlow)</li>
+      <li>Describe the <strong>problem</strong> your project solves, not just the features</li>
+      <li>Include your <strong>target users</strong> (students, hospitals, factories, etc.)</li>
+      <li>A longer, more detailed description gives a more accurate similarity score</li>
+    </ul>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- check.js handles live word counting and form validation -->
+<script src="{{ url_for('static', filename='js/check.js') }}"></script>
+{% endblock %}

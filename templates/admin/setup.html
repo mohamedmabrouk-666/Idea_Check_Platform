@@ -1,0 +1,124 @@
+
+<!--
+  admin/setup.html — First-Time Setup Page
+  Sprint 8 — shown ONLY when no admin exists in the database
+  After the first admin is created, this page locks forever
+  General idea: university opens the project and sets their own credentials
+  Connected to: routes/admin.py → setup()
+-->
+{% extends "base.html" %}
+{% block title %}First-Time Setup — IdeaCheck{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card" style="max-width: 520px;">
+
+    <!-- Setup header with warning icon -->
+    <div class="text-center" style="margin-bottom: 1.5rem;">
+      <div style="font-size: 3rem; margin-bottom: 0.5rem;">
+        <i class="fas fa-cog" style="color: var(--accent);"></i>
+      </div>
+      <h2>First-Time Setup</h2>
+      <p class="auth-subtitle">
+        Welcome to IdeaCheck. Create your admin account to get started.
+        This page will be locked after setup is complete.
+      </p>
+    </div>
+
+    <!-- Setup notice box -->
+    <div style="background: #fff8e1; border-left: 4px solid var(--warning);
+                padding: 12px 16px; border-radius: var(--radius);
+                margin-bottom: 1.5rem; font-size: 0.9rem;">
+      <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
+      <strong> Important:</strong> You will need the setup code provided by the developer
+      to complete this step.
+    </div>
+
+    <!-- Setup form — POST to /admin/setup -->
+    <form method="POST" action="{{ url_for('admin.setup') }}">
+      <!-- CSRF hidden token — Flask-WTF verifies this on every POST request -->
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+
+      <!-- Admin full name -->
+      <div class="form-group">
+        <label for="name">
+          <i class="fas fa-user"></i> Full Name
+        </label>
+        <input type="text" id="name" name="name"
+               placeholder="e.g. Dr. Ahmed Mohamed"
+               required />
+      </div>
+
+      <!-- Admin email — used for login -->
+      <div class="form-group">
+        <label for="email">
+          <i class="fas fa-envelope"></i> Email Address
+        </label>
+        <input type="email" id="email" name="email"
+               placeholder="admin@university.edu"
+               required />
+      </div>
+
+      <!-- Password — minimum 8 characters -->
+      <div class="form-group">
+        <label for="password">
+          <i class="fas fa-lock"></i> Password
+          <span class="label-hint">(at least 8 characters)</span>
+        </label>
+        <input type="password" id="password" name="password"
+               placeholder="Choose a strong password"
+               required minlength="8" />
+      </div>
+
+      <!-- Confirm password -->
+      <div class="form-group">
+        <label for="confirm_password">
+          <i class="fas fa-lock"></i> Confirm Password
+        </label>
+        <input type="password" id="confirm_password" name="confirm_password"
+               placeholder="Repeat your password"
+               required minlength="8" />
+      </div>
+
+      <!-- Divider line before the secret code -->
+      <hr class="divider" />
+
+      <!-- Setup secret code — given by developer to university -->
+      <div class="form-group">
+        <label for="setup_code">
+          <i class="fas fa-key"></i> Setup Code
+          <span class="label-hint">(provided by developer)</span>
+        </label>
+        <input type="text" id="setup_code" name="setup_code"
+               placeholder="Enter the setup code"
+               required />
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit" class="btn btn-primary btn-block">
+        <i class="fas fa-check-circle"></i> Complete Setup
+      </button>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ── Client-side password match validation ────────────────────
+// Check that both password fields match before submitting
+document.querySelector("form").addEventListener("submit", function(e) {
+  const pw  = document.getElementById("password").value;       // First password
+  const cpw = document.getElementById("confirm_password").value; // Confirm password
+
+  if (pw !== cpw) {
+    e.preventDefault();  // Stop form from submitting
+    alert("Passwords do not match. Please try again.");
+    document.getElementById("confirm_password").focus();  // Focus on confirm field
+  }
+});
+</script>
+{% endblock %}

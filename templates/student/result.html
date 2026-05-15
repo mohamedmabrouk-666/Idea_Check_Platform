@@ -1,0 +1,113 @@
+<!--
+  student/result.html — Similarity Result Page
+  Shows: score percentage, progress bar, similar projects list, suggestions
+  Data passed from routes/student.py: submission, score, top_matches, suggestion
+-->
+{% extends "base.html" %}
+{% block title %}Result — IdeaCheck{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <h1><i class="fas fa-chart-pie"></i> Similarity Analysis Result</h1>
+    <p>Here is the analysis for: <strong>{{ submission.title }}</strong></p>
+  </div>
+
+  <!-- ── SCORE DISPLAY ──────────────────────────────────── -->
+  <!-- Big score number with color based on severity -->
+  <div class="score-display score-{{ suggestion.status }}">
+    <div class="score-number">{{ score | round(1) }}%</div>
+    <div class="score-label">Similarity Score</div>
+
+    <!-- Progress bar — width set via inline style, animated in result.js -->
+    <div class="progress-bar-container" style="max-width: 400px; margin: 1rem auto 0;">
+      <div class="progress-bar-fill {{ suggestion.status }}"
+           id="progressBar"
+           style="width: 0%"
+           data-score="{{ score }}">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SUGGESTION BOX ────────────────────────────────── -->
+  <!-- Advice section based on score range -->
+  <div class="suggestion-box {{ suggestion.status }}">
+    <div class="suggestion-title">
+      <!-- Icon based on result status -->
+      {% if suggestion.status == 'danger' %}
+        <i class="fas fa-exclamation-triangle"></i>
+      {% elif suggestion.status == 'warning' %}
+        <i class="fas fa-exclamation-circle"></i>
+      {% else %}
+        <i class="fas fa-check-circle"></i>
+      {% endif %}
+      {{ suggestion.title }}
+    </div>
+    <p>{{ suggestion.message }}</p>
+
+    <!-- Actionable tips list -->
+    <ul class="suggestion-tips">
+      {% for tip in suggestion.tips %}
+        <li>{{ tip }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- ── TOP SIMILAR PROJECTS ──────────────────────────── -->
+  {% if top_matches %}
+  <div class="card">
+    <div class="card-title">
+      <i class="fas fa-list-ul"></i> Most Similar Previous Projects
+    </div>
+
+    <!-- Loop through top 5 most similar old projects -->
+    {% for match in top_matches %}
+    <div class="match-item">
+      <div>
+        <div class="match-title">{{ match.title }}</div>
+        <!-- Department and year metadata -->
+        <div class="match-meta">
+          <i class="fas fa-building"></i> {{ match.department or 'N/A' }}
+          &nbsp;|&nbsp;
+          <i class="fas fa-calendar"></i> {{ match.year or 'N/A' }}
+        </div>
+      </div>
+      <!-- Similarity score for this specific project -->
+      <div class="match-score" style="color:
+        {% if match.score >= 70 %}var(--danger)
+        {% elif match.score >= 40 %}var(--warning)
+        {% else %}var(--success){% endif %}">
+        {{ match.score }}%
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+  {% endif %}
+
+  <!-- ── ACTION BUTTONS ────────────────────────────────── -->
+  <div class="flex-gap mt-2 mb-2">
+    <!-- Check another idea -->
+    <a href="{{ url_for('student.check') }}" class="btn btn-primary">
+      <i class="fas fa-redo"></i> Check Another Idea
+    </a>
+    <!-- View submission history -->
+    <a href="{{ url_for('student.history') }}" class="btn btn-secondary">
+      <i class="fas fa-history"></i> My History
+    </a>
+    <!-- Download result as PDF — Sprint 12 -->
+    <a href="{{ url_for('student.download_pdf', submission_id=submission.id) }}"
+       class="btn btn-secondary">
+      <i class="fas fa-file-pdf"></i> Download PDF
+    </a>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- result.js animates the progress bar on page load -->
+<script src="{{ url_for('static', filename='js/result.js') }}"></script>
+{% endblock %}

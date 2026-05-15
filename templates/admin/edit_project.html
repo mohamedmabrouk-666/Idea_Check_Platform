@@ -1,0 +1,171 @@
+
+<!--
+  admin/edit_project.html — Edit Existing Project Page
+  Sprint 9 — admin can update any old project's data
+  Form is pre-filled with current project data from DB
+  Connected to: routes/admin.py → edit_project()
+-->
+{% extends "base.html" %}
+{% block title %}Edit Project — IdeaCheck{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <h1><i class="fas fa-edit"></i> Edit Project</h1>
+    <p>Update the details of this graduation project</p>
+  </div>
+
+  <!-- Edit form card -->
+  <div class="card">
+    <div class="card-title">
+      <i class="fas fa-pencil-alt"></i> Project Details
+    </div>
+
+    <!--
+      Form pre-filled with existing project data
+      POST to /admin/projects/edit/<project_id>
+      project.value — values loaded from DB in routes/admin.py
+    -->
+    <form method="POST"
+          action="{{ url_for('admin.edit_project', project_id=project.id) }}">
+      <!-- CSRF hidden token — Flask-WTF verifies this on every POST request -->
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+
+      <!-- Project title — pre-filled with current title -->
+      <div class="form-group">
+        <label for="title">Project Title</label>
+        <input type="text" id="title" name="title"
+               value="{{ project.title }}"
+               placeholder="Enter project title"
+               required />
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+
+        <!-- Department dropdown — pre-selected with current department -->
+        <div class="form-group">
+          <label for="department">Department</label>
+          <select id="department" name="department">
+            <option value="">— Select Department —</option>
+
+            <!-- Loop through departments and mark current one as selected -->
+            {% for dept in [
+              'Computer Engineering',
+              'Electrical Engineering',
+              'Mechanical Engineering',
+              'Civil Engineering',
+              'Chemical Engineering',
+              'Communications Engineering'
+            ] %}
+            <option value="{{ dept }}"
+              {% if project.department == dept %}selected{% endif %}>
+              {{ dept }}
+            </option>
+            {% endfor %}
+
+          </select>
+        </div>
+
+        <!-- Year — pre-filled with current year -->
+        <div class="form-group">
+          <label for="year">Year</label>
+          <input type="number" id="year" name="year"
+                 value="{{ project.year or '' }}"
+                 placeholder="e.g. 2023"
+                 min="2000" max="2030" />
+        </div>
+
+      </div>
+
+      <!-- Keywords — pre-filled with current keywords -->
+      <div class="form-group">
+        <label for="keywords">
+          Keywords
+          <span class="label-hint">(optional, comma-separated)</span>
+        </label>
+        <input type="text" id="keywords" name="keywords"
+               value="{{ project.keywords or '' }}"
+               placeholder="e.g. IoT, Arduino, mobile app" />
+      </div>
+
+      <!-- Description textarea — pre-filled with current description -->
+      <div class="form-group">
+        <label for="description">
+          Project Description
+          <span class="label-hint">(at least 50 words)</span>
+        </label>
+        <textarea id="description" name="description"
+                  rows="7" required>{{ project.description }}</textarea>
+        <!-- Live word counter — same as check.html -->
+        <div class="word-counter" id="descCounter">0 words</div>
+      </div>
+
+      <!-- Action buttons row -->
+      <div class="flex-gap">
+
+        <!-- Save changes button -->
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+
+        <!-- Cancel — go back to projects list without saving -->
+        <a href="{{ url_for('admin.projects') }}" class="btn btn-secondary">
+          <i class="fas fa-times"></i> Cancel
+        </a>
+
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Project ID info box — for reference -->
+  <div class="card" style="background: var(--light); border: 1px solid var(--border);">
+    <p style="font-size: 0.88rem; color: var(--gray); margin: 0;">
+      <i class="fas fa-info-circle"></i>
+      Editing project ID: <strong>#{{ project.id }}</strong>
+      &nbsp;|&nbsp;
+      Added on: <strong>{{ project.created_at.strftime('%d %b %Y') if project.created_at else 'N/A' }}</strong>
+    </p>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ── Live word counter for description textarea ───────────────
+// Reusing same logic as check.js — counts words as admin types
+const descInput   = document.getElementById("description");   // Description textarea
+const descCounter = document.getElementById("descCounter");   // Counter display
+
+if (descInput && descCounter) {
+  // Count words on page load (textarea is pre-filled)
+  function countWords(text) {
+    return text.trim().split(/\s+/).filter(w => w.length > 0).length;
+  }
+
+  // Update counter immediately when page loads
+  descCounter.textContent = countWords(descInput.value) + " words";
+
+  // Update counter as admin types
+  descInput.addEventListener("input", function() {
+    const count = countWords(this.value);
+    descCounter.textContent = count + " words";
+
+    // Color feedback: green if >= 50, red if less
+    descCounter.className = "word-counter";
+    if (count >= 50) {
+      descCounter.classList.add("ok");       // Green — enough detail
+    } else {
+      descCounter.classList.add("too-few"); // Red — needs more detail
+    }
+  });
+
+  // Trigger on load to show initial count
+  descInput.dispatchEvent(new Event("input"));
+}
+</script>
+{% endblock %}

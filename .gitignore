@@ -1,0 +1,10 @@
+# ============================================================
+# .gitignore — Files that should NOT be uploaded to GitHub
+# ============================================================
+
+.env                  # Secret keys and DB credentials
+__pycache__/          # Python compiled cache
+*.pyc                 # Python bytecode files
+venv/                 # Virtual environment folder
+.DS_Store             # Mac OS system file
+*.log                 # Log files

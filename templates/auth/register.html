@@ -1,0 +1,61 @@
+
+<!--
+  auth/register.html — Registration Page
+  New students create their account here
+  Submits POST to /register route in routes/auth.py
+-->
+{% extends "base.html" %}
+{% block title %}Register — IdeaCheck{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <!-- Page heading -->
+    <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+    <p class="auth-subtitle">Register to check your graduation project idea</p>
+
+    <!-- Registration form — POST to /register -->
+    <form method="POST" action="{{ url_for('auth.register') }}">
+      <!-- CSRF hidden token — Flask-WTF verifies this on every POST request -->
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+
+      <!-- Full name -->
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name"
+               placeholder="e.g. Mohamed Ahmed" required />
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email"
+               placeholder="your@university.edu" required />
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password
+          <span class="label-hint">(at least 6 characters)</span>
+        </label>
+        <input type="password" id="password" name="password"
+               placeholder="Choose a secure password" required minlength="6" />
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit" class="btn btn-primary btn-block">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+
+    </form>
+
+    <!-- Link back to login -->
+    <p class="auth-switch">
+      Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}
