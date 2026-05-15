@@ -13,3 +13,4 @@ reportlab==4.1.0           # PDF export for result reports
 flask-limiter==3.5.0       # Rate limiting (prevent spam/abuse)
 flask-wtf==1.2.1           # CSRF protection — prevent cross-site request forgery
 PyMySQL==1.1.0
+gunicorn
